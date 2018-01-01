@@ -128,27 +128,6 @@ def jump(distance):
     print(cmd)
     os.system(cmd)
 
-# 转换色彩模式hsv2rgb
-def hsv2rgb(h, s, v):
-    h = float(h)
-    s = float(s)
-    v = float(v)
-    h60 = h / 60.0
-    h60f = math.floor(h60)
-    hi = int(h60f) % 6
-    f = h60 - h60f
-    p = v * (1 - s)
-    q = v * (1 - f * s)
-    t = v * (1 - (1 - f) * s)
-    r, g, b = 0, 0, 0
-    if hi == 0: r, g, b = v, t, p
-    elif hi == 1: r, g, b = q, v, p
-    elif hi == 2: r, g, b = p, v, t
-    elif hi == 3: r, g, b = p, q, v
-    elif hi == 4: r, g, b = t, p, v
-    elif hi == 5: r, g, b = v, p, q
-    r, g, b = int(r * 255), int(g * 255), int(b * 255)
-    return r, g, b
 
 # 转换色彩模式rgb2hsv
 def rgb2hsv(r, g, b):
@@ -257,8 +236,8 @@ def find_piece_and_board(im):
                 # 修掉脑袋比下一个小格子还高的情况的 bug
                 if abs(j - piece_x) < piece_body_width:
                     continue
-                if (abs(pixel[0] - last_pixel[0]) + abs(pixel[1] - last_pixel[1]) + abs(pixel[2] - last_pixel[2])
-                        > 10) and (abs(pixel[0] - r) + abs(pixel[1] - g) + abs(pixel[2] - b) > 10):
+                if (abs(pixel[0] - last_pixel[0]) + abs(pixel[1] - last_pixel[1]) + abs(pixel[2] - last_pixel[2])> 10)\
+                        and not check_shadow(pixel, last_pixel):
                     if left_value == j:
                         left_count = left_count+1
                     else:
@@ -276,8 +255,8 @@ def find_piece_and_board(im):
                 # 修掉脑袋比下一个小格子还高的情况的 bug
                 if abs(j - piece_x) < piece_body_width:
                     continue
-                if (abs(pixel[0] - last_pixel[0]) + abs(pixel[1] - last_pixel[1]) + abs(pixel[2] - last_pixel[2])
-                    > 10) and (abs(pixel[0] - r) + abs(pixel[1] - g) + abs(pixel[2] - b) > 10):
+                if (abs(pixel[0] - last_pixel[0]) + abs(pixel[1] - last_pixel[1]) + abs(pixel[2] - last_pixel[2]) > 10)\
+                        and not check_shadow(pixel, last_pixel):
                     if right_value == j:
                         right_count = right_count + 1
                     else:
@@ -320,6 +299,11 @@ def dump_device_info():
     ))
 
 
+# 检查阴影 如果颜色a是颜色b的阴影,返回True
+def check_shadow(pixel_a, pixel_b):
+    pixel_a_h, pixel_a_s, pixel_a_v = rgb2hsv(pixel_a[0], pixel_a[1], pixel_a[2])
+    pixel_b_h, pixel_b_s, pixel_b_v = rgb2hsv(pixel_b[0], pixel_b[1], pixel_b[2])
+    return abs(pixel_a_h-pixel_b_h) + abs(pixel_a_s - pixel_b_s) < 10
 def check_adb():
     flag = os.system('adb devices')
     if flag == 1:
