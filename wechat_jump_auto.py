@@ -202,9 +202,6 @@ def find_piece_and_board(im):
     for i in range(int(h / 3), int(h * 2 / 3)):
 
         last_pixel = im_pixel[0, i]
-        # 计算阴影的RGB值,通过photoshop观察,阴影部分其实就是背景色的明度V 乘以0.7的样子
-        h, s, v = rgb2hsv(last_pixel[0], last_pixel[1], last_pixel[2])
-        r, g, b = hsv2rgb(h, s, v * 0.7)
 
         if from_left_find_board_y and from_right_find_board_y:
             break
@@ -312,12 +309,6 @@ def check_adb():
 
 
 def main():
-
-    h, s, v = rgb2hsv(201, 204, 214)
-    print(h, s, v)
-    r, g, b = hsv2rgb(h, s, v*0.7)
-    print(r, g, b)
-
     dump_device_info()
     check_adb()
     while True:
